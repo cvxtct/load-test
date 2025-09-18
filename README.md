@@ -1,13 +1,15 @@
 # Rust load tester
 
+## Start
+0) Create `config.yaml` `payload.json`.
+1) Quick (single process)
+`cargo run --release -- --config ./config.yaml`
 
-1) quick smoke test (single process)
-cargo run --release -- --config ./config.yaml
+2) With multiple processes (set processes: 4 in config)
+`cargo run --release -- --config ./config.yaml`
 
-2) with multiple processes (set processes: 4 in config)
-cargo run --release -- --config ./config.yaml
 
-`config.yaml`
+### Example config
 ```Yaml
 # Target endpoint and method
 target_url: "https://your-endpoint"
@@ -40,7 +42,7 @@ timeout: "5s"                  # "500ms", "2s" etc.
 verify_tls: true
 ```
 
-`payload.json`
+### Example payload
 ```Json
 {
   "hello": "world",
