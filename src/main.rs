@@ -261,6 +261,7 @@ async fn run_worker(worker_id: usize, cfg: &Config) -> Result<()> {
         .with_context(|| format!("invalid timeout: {}", cfg.timeout))?;
 
     let client = Client::builder()
+        // .pool_max_idle_per_host(0) // Disable connection reuse
         .timeout(timeout)
         .danger_accept_invalid_certs(!cfg.verify_tls)
         .pool_idle_timeout(std::time::Duration::from_secs(30))
