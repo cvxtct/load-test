@@ -150,6 +150,9 @@ async fn main() -> Result<()> {
         return Err(anyhow!("processes must be >= 1"));
     }
 
+    println!("Starting load test...");
+    print_config(&cfg);
+
     match cli.worker {
         None => {
             if cfg.processes == 1 {
@@ -394,6 +397,32 @@ fn print_summary(worker_id: usize, m: &Metrics, elapsed_s: f64) {
             }
         }
     }
+}
+
+/// Prints the configuration being used for the load test.
+/// 
+/// This function outputs the configuration details to the console, allowing users to verify
+/// the settings before the test begins.
+/// 
+/// # Arguments
+/// 
+/// * `cfg` - The configuration object to print.
+fn print_config(cfg: &Config) {
+    println!("Configuration:");
+    println!("  Target URL: {}", cfg.target_url);
+    println!("  Method: {}", cfg.method);
+    println!("  Headers: {:?}", cfg.headers);
+    if let Some(payload_file) = &cfg.payload_file {
+        println!("  Payload File: {}", payload_file);
+    } else {
+        println!("  Payload File: None");
+    }
+    println!("  Duration: {}", cfg.duration);
+    println!("  Rate per Second: {}", cfg.rate_per_sec);
+    println!("  Concurrency per Process: {}", cfg.concurrency_per_process);
+    println!("  Processes: {}", cfg.processes);
+    println!("  Timeout: {}", cfg.timeout);
+    println!("  Verify TLS: {}", cfg.verify_tls);
 }
 
 /// Retrieves the value at a specific quantile from a histogram.
