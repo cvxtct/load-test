@@ -1,5 +1,5 @@
 use anyhow::Result;
-use clap::Parser;  
+use clap::Parser;
 use tracing_subscriber::EnvFilter;
 
 use rstress_core::{
