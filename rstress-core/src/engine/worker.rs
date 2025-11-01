@@ -42,12 +42,10 @@ pub async fn run_worker(worker_id: usize, cfg: &Config) -> Result<Metrics> {
     limiter.set_missed_tick_behavior(time::MissedTickBehavior::Delay);
     let semaphore = Arc::new(Semaphore::new(cfg.concurrency_per_process));
 
-    // (ok, latency_us, Option<status_code>, Option<transport_kind>)
     let (tx, mut rx) = mpsc::channel::<(bool, u64, Option<u16>, Option<&'static str>)>(4096);
 
     let start_at = Instant::now();
     let end_at = start_at + duration;
-    //let method = spec.method.clone();
 
     while Instant::now() < end_at {
         limiter.tick().await;
