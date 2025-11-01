@@ -46,3 +46,28 @@ impl Metrics {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn record_and_merge() {
+        let mut a = Metrics::new();
+        a.record(true, 1000, Some(200));
+        a.record(false, 2000, None); // transport → code 0
+
+        assert_eq!(a.sent, 2);
+        assert_eq!(a.ok, 1);
+        assert_eq!(a.err, 1);
+        assert_eq!(*a.codes.get(&200).unwrap(), 1);
+        assert_eq!(*a.codes.get(&0).unwrap(), 1);
+
+        let mut b = Metrics::new();
+        b.record(true, 1500, Some(201));
+        a.merge(&b);
+
+        assert_eq!(a.sent, 3);
+        assert_eq!(*a.codes.get(&201).unwrap(), 1);
+    }
+}

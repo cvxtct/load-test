@@ -12,9 +12,10 @@ You are solely responsible for how you use it — including any load generated a
 ----
 
 ```bash
-cargo build
+make all
 cargo run -p rstress -- --config ./config.yaml
 ```
+
 
 ```Yaml
 
