@@ -26,6 +26,12 @@ pub fn print_human(worker: Option<usize>, m: &Metrics, elapsed_s: f64) {
             else { println!("  {}: {}", code, count); }
         }
     }
+    if !m.transport.is_empty() {
+        println!("transport error kinds:");
+        for (k, v) in &m.transport {
+            println!("  {k}: {v}");
+        }
+    }
 }
 
 #[derive(Serialize)]
@@ -34,6 +40,7 @@ struct MetricsJson<'a> {
     ok: u64,
     err: u64,
     codes: &'a std::collections::BTreeMap<u16, u64>,
+    transport: &'a std::collections::BTreeMap<&'static str, u64>,
     p50_ms: f64,
     p95_ms: f64,
     p99_ms: f64,
@@ -45,6 +52,7 @@ pub fn print_json(m: &Metrics) -> String {
         ok: m.ok,
         err: m.err,
         codes: &m.codes,
+        transport: &m.transport,
         p50_ms: quantile_ms(&m.hist, 50.0),
         p95_ms: quantile_ms(&m.hist, 95.0),
         p99_ms: quantile_ms(&m.hist, 99.0),
