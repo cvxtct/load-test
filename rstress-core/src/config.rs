@@ -10,35 +10,29 @@ pub struct Config {
     pub headers: HashMap<String, String>,
     #[serde(default)]
     pub payload_file: Option<String>,
-    /// e.g. "30s"
-    pub duration: String,
-    /// total rate; master splits across workers
-    pub rate_per_sec: u32,
-    /// async concurrency per process
-    pub concurrency_per_process: usize,
-    /// number of OS processes
-    pub processes: usize,
-    /// per-request timeout, e.g. "5s"
-    pub timeout: String,
-    /// Max idle connection per host on the pool.
-    pub pool_max_idle: usize,
-    /// How long idle connections are kept before being closed.
-    pub pool_idle_timeout: u64,
+
+    pub duration: String,                // "30s"
+    pub rate_per_sec: u32,               // total rate across processes
+    pub concurrency_per_process: usize,  // per process
+    pub processes: usize,                // OS processes
+    pub timeout: String,                 // per-request timeout
     #[serde(default = "default_verify_tls")]
     pub verify_tls: bool,
+
+    // NEW: connection pool knobs
+    #[serde(default = "default_pool_max_idle")]
+    pub pool_max_idle: usize,
+    #[serde(default = "default_pool_idle_timeout")]
+    pub pool_idle_timeout: u64, // seconds
 }
 
 fn default_verify_tls() -> bool { true }
+fn default_pool_max_idle() -> usize { usize::MAX } // allow reuse by default
+fn default_pool_idle_timeout() -> u64 { 30 }
 
 pub fn load_config(path: &PathBuf) -> Result<Config> {
     let data = fs::read_to_string(path).with_context(|| format!("reading {:?}", path))?;
-    // TOML if extension says so; else try YAML then TOML
-    if path
-        .extension()
-        .and_then(|s| s.to_str())
-        .map(|e| e.eq_ignore_ascii_case("toml"))
-        .unwrap_or(false)
-    {
+    if path.extension().and_then(|s| s.to_str()).map(|e| e.eq_ignore_ascii_case("toml")).unwrap_or(false) {
         Ok(toml::from_str::<Config>(&data).context("parsing TOML config")?)
     } else {
         match serde_yaml::from_str::<Config>(&data) {
@@ -54,16 +48,13 @@ pub fn print_config(cfg: &Config) {
     println!("  Target URL: {}", cfg.target_url);
     println!("  Method: {}", cfg.method);
     println!("  Headers: {:?}", cfg.headers);
-    match &cfg.payload_file {
-        Some(p) => println!("  Payload File: {}", p),
-        None => println!("  Payload File: None"),
-    }
+    println!("  Payload File: {}", cfg.payload_file.as_deref().unwrap_or("None"));
     println!("  Duration: {}", cfg.duration);
     println!("  Rate per Second: {}", cfg.rate_per_sec);
     println!("  Concurrency per Process: {}", cfg.concurrency_per_process);
     println!("  Processes: {}", cfg.processes);
     println!("  Timeout: {}", cfg.timeout);
-    println!("  Max idle conn per pool: {}", cfg.pool_max_idle);
-    println!("  Idle connections keep time out: {}", cfg.pool_idle_timeout);
     println!("  Verify TLS: {}", cfg.verify_tls);
+    println!("  Pool Max Idle/Host: {}", cfg.pool_max_idle);
+    println!("  Pool Idle Timeout: {}s", cfg.pool_idle_timeout);
 }
