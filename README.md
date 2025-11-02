@@ -1,13 +1,56 @@
-# `rstress` Rust load tester 
+# `rstress` web application stress tester in Rust
 ![status](https://img.shields.io/badge/status-experimental-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![rust](https://img.shields.io/badge/rust-🦀-blue)
- 
 
-### Usage
-----
+
+`rstress` is a modern, high-performance HTTP load testing tool written in Rust.
+It’s designed to be fast, minimal, and reliable — ***giving you precise latency metrics and transparent concurrency control without the complexity of larger frameworks.***
+
+This project started as a study and experimentation tool to explore async concurrency, multi-process coordination, in Rust.
+
+
+## Key Features
+
+- Async load generation powered by tokio and reqwest
+- High-resolution latency histograms (via hdrhistogram)
+- Multi-process scaling with per-worker isolation
+- Quantiles, RPS, status codes, transport error tracking
+- Optional JSON report output with redacted configuration snapshot
+- Simple YAML/TOML config, no scripting required
+
+
+## Project Status
+
+This is an experimental and evolving project — use at your own risk.
+APIs, output formats, and internal structures may change between versions.
+That said, it’s stable enough to run real-world load experiments, measure latency, and stress endpoints safely in controlled environments.
+
+## Motivation
+
+I’ve always wanted to build my own load-testing tool — something that fits exactly how I think and work.
+
+`rstress` is both a practical tool and a learning journey, a personal playground to explore async concurrency, performance measurement, and Rust itself. But it quickly proved its value in practice: I’ve already applied it successfully several times in real-world load scenarios, and those results gave the momentum to evolve it into a more complete MVP.
+
+## Planned Improvements
+
+- Payload providers – unified trait.
+- Dynamic traffic shaping – smoothly transition from normal to extreme loads.
+- Auth layer – pluggable authentication (Bearer, Basic, custom headers).
+- Response handling – optional validation for status codes or body regex matches.
+- Per-worker configuration – fine-tuned setups per process.
+- Adaptive rate control – dynamically adjust tick interval based on measured RPS to stay on target.
+- Per-request timeout – finer-grained control with tokio::time::timeout.
+- HTTP/2 vs HTTP/1.1 – expose protocol selection in config to study parallelism effects.
+- DNS strategy – allow fixed IPs or pre-resolved targets to remove DNS noise.
+- Payload reuse – leverage Bytes + Arc for efficient reuse of large static bodies.
+
+
+## Usage
+
 
 ```bash
+git clone
 make all
 cargo run -p rstress -- --config ./config.yaml
 ```
@@ -56,7 +99,7 @@ pool_idle_timeout: 0
 verify_tls: true
 ```
 
-### Report
+## Report
 ---
 ```
 [worker 0] sent=91 ok=91 err=0 rps=3.0 p50=552.45ms p95=552.96ms p99=553.47ms
