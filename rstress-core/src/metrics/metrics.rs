@@ -6,9 +6,9 @@ pub struct Metrics {
     pub sent: u64,
     pub ok: u64,
     pub err: u64,
-    pub hist: Histogram<u64>,               // microseconds
-    pub codes: BTreeMap<u16, u64>,          // HTTP status counts; 0 == transport error
-    pub transport: BTreeMap<&'static str, u64>, // classified transport errors
+    pub hist: Histogram<u64>,                           // microseconds
+    pub codes: BTreeMap<u16, u64>,                      // HTTP status counts; 0 == transport error
+    pub transport: BTreeMap<&'static str, u64>,         // classified transport errors
 }
 
 impl Default for Metrics {
