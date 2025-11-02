@@ -2,11 +2,7 @@
 ![status](https://img.shields.io/badge/status-experimental-orange)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![rust](https://img.shields.io/badge/rust-🦀-blue)
-
-
-***This software is under active development** and provided for **educational and research purposes*** only.
-***Features, APIs, and results may change or behave unexpectedly.
-You are solely responsible for how you use it — including any load generated against remote systems.***
+ 
 
 ### Usage
 ----
