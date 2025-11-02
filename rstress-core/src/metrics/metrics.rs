@@ -11,6 +11,12 @@ pub struct Metrics {
     pub transport: BTreeMap<&'static str, u64>, // classified transport errors
 }
 
+impl Default for Metrics {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Metrics {
     pub fn new() -> Self {
         let mut h = Histogram::<u64>::new_with_bounds(1, 10_000_000, 3).unwrap(); // 1us..10s
