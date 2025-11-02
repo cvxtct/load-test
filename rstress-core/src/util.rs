@@ -19,7 +19,7 @@ pub fn classify_reqwest_error(e: &reqwest::Error) -> &'static str {
         if let Some(ioe) = err.downcast_ref::<std::io::Error>() {
             use std::io::ErrorKind::*;
             return match ioe.kind() {
-                TimedOut => "timeout",
+                TimedOut => "canceled_timeout",
                 ConnectionAborted | ConnectionReset | BrokenPipe => "conn_reset",
                 UnexpectedEof => "unexpected_eof",
                 _ => "io_other",
