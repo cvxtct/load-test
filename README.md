@@ -12,7 +12,6 @@ make all
 cargo run -p rstress -- --config ./config.yaml
 ```
 
-
 ```Yaml
 
 # Target endpoint and method
