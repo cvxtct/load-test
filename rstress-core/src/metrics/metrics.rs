@@ -6,9 +6,15 @@ pub struct Metrics {
     pub sent: u64,
     pub ok: u64,
     pub err: u64,
-    pub hist: Histogram<u64>,               // microseconds
-    pub codes: BTreeMap<u16, u64>,          // HTTP status counts; 0 == transport error
-    pub transport: BTreeMap<&'static str, u64>, // classified transport errors
+    pub hist: Histogram<u64>,                           // microseconds
+    pub codes: BTreeMap<u16, u64>,                      // HTTP status counts; 0 == transport error
+    pub transport: BTreeMap<&'static str, u64>,         // classified transport errors
+}
+
+impl Default for Metrics {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Metrics {
@@ -44,5 +50,30 @@ impl Metrics {
         for (k, v) in &other.transport {
             *self.transport.entry(*k).or_insert(0) += v;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn record_and_merge() {
+        let mut a = Metrics::new();
+        a.record(true, 1000, Some(200));
+        a.record(false, 2000, None); // transport → code 0
+
+        assert_eq!(a.sent, 2);
+        assert_eq!(a.ok, 1);
+        assert_eq!(a.err, 1);
+        assert_eq!(*a.codes.get(&200).unwrap(), 1);
+        assert_eq!(*a.codes.get(&0).unwrap(), 1);
+
+        let mut b = Metrics::new();
+        b.record(true, 1500, Some(201));
+        a.merge(&b);
+
+        assert_eq!(a.sent, 3);
+        assert_eq!(*a.codes.get(&201).unwrap(), 1);
     }
 }

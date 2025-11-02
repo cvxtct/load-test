@@ -29,3 +29,15 @@ pub fn classify_reqwest_error(e: &reqwest::Error) -> &'static str {
     }
     "other"
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn ok_status_nonzero() {
+        assert!(is_ok_status(200));
+        assert!(is_ok_status(404));
+        assert!(!is_ok_status(0));
+    }
+}
