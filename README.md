@@ -4,20 +4,20 @@
 ![rust](https://img.shields.io/badge/rust-🦀-blue)
 
 
-`rstress` is a modern, high-performance HTTP load testing tool written in Rust.
-It’s designed to be fast, minimal, and reliable — ***giving you precise latency metrics and transparent concurrency control without the complexity of larger frameworks.***
+`rstress` is a HTTP load testing tool written in Rust. The endeavor is to keep it fast, simple, and reliable. — The capability to ***expose the breaking point of the system with precision.***
 
 This project started as a study and experimentation tool to explore async concurrency, multi-process coordination, in Rust.
 
 
 ## Key Features
 
-- Async load generation powered by tokio and reqwest
-- High-resolution latency histograms (via hdrhistogram)
-- Multi-process scaling with per-worker isolation
-- Quantiles, RPS, status codes, transport error tracking
-- Optional JSON report output with redacted configuration snapshot
-- Simple YAML/TOML config, no scripting required
+- Built on tokio and reqwest for high concurrency without complexity
+- Precise latency histograms using hdrhistogram — see what really happens under pressure
+- Multi-process mode to push CPU and network limits cleanly
+- Metrics that matter: RPS, quantiles, status codes, and transport errors
+- Realistic client behavior — tune timeouts, connection reuse, and idle socket lifetimes to see how the system handles real-world load
+- Structured output — generate JSON reports with configuration and results for tracking runs over time
+
 
 
 ## Project Status
@@ -28,9 +28,9 @@ That said, it’s stable enough to run real-world load experiments, measure late
 
 ## Motivation
 
-I’ve always wanted to build my own load-testing tool — something that fits exactly how I think and work.
+I’ve always wanted a tailored tool that I can spin up within moments — one that provides clear, meaningful insights into application and system performance over time.
 
-`rstress` is both a practical tool and a learning journey, a personal playground to explore async concurrency, performance measurement, and Rust itself. But it quickly proved its value in practice: I’ve already applied it successfully several times in real-world load scenarios, and those results gave the momentum to evolve it into a more complete MVP.
+`rstress` is both a practical tool and a learning journey, a personal playground to explore async concurrency, performance measurement, and Rust itself. 
 
 ## Planned Improvements
 
