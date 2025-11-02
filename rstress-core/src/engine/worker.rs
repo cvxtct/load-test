@@ -3,6 +3,7 @@ use bytes::Bytes;
 use reqwest::Client;
 use std::{sync::Arc, time::Instant};
 use tokio::{sync::{mpsc, Semaphore}, time};
+use tokio::time::{timeout, Duration};
 use tracing::info;
 
 use crate::{
@@ -64,6 +65,8 @@ pub async fn run_worker(worker_id: usize, cfg: &Config) -> Result<Metrics> {
         // 👇 clone here so each task owns its own Method
         let method = method.clone();
 
+        let timeout_r = cfg.timeout_r;
+
         tokio::spawn(async move {
             let _permit = permit;
             let t0 = Instant::now();
@@ -76,13 +79,19 @@ pub async fn run_worker(worker_id: usize, cfg: &Config) -> Result<Metrics> {
                 req = req.body(body.as_ref().clone());
             }
 
-            let (ok, code, kind_opt) = match req.send().await {
-                Ok(resp) => {
+            // Simulate request based timeout
+            let res = timeout(Duration::from_secs(timeout_r), req.send()).await;
+
+            let (ok, code, kind_opt) = match res {
+                Ok(Ok(resp)) => {
                     let status = resp.status().as_u16();
                     let _ = resp.bytes().await; // drain to reuse connection
                     (is_ok_status(status), Some(status), None)
                 }
-                Err(e) => (false, None, Some(classify_reqwest_error(&e))),
+                // The request itself failed (connection, DNS, etc.)
+                Ok(Err(e)) => (false, None, Some(classify_reqwest_error(&e))),
+                // The timeout fired
+                Err(_elapsed) => (false, None, Some("request_timeout")),
             };
 
             let lat_us = t0.elapsed().as_micros() as u64;
