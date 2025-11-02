@@ -4,19 +4,20 @@
 ![rust](https://img.shields.io/badge/rust-🦀-blue)
 
 
-`rstress` is a HTTP load testing tool written in Rust. The endeavor is to turn it into fast, simple, and reliable tool. — The capability to ***to expose the breaking point of the system with precision.***
+`rstress` is a HTTP load testing tool written in Rust. The endeavor is to keep it fast, simple, and reliable. — The capability to ***expose the breaking point of the system with precision.***
 
 This project started as a study and experimentation tool to explore async concurrency, multi-process coordination, in Rust.
 
 
 ## Key Features
 
-- Async load generation powered by tokio and reqwest
-- High-resolution latency histograms (via hdrhistogram)
-- Multi-process scaling with per-worker isolation
-- Quantiles, RPS, status codes, transport error tracking
-- Optional JSON report output with redacted configuration snapshot
-- Simple YAML/TOML config, no scripting required
+- Built on tokio and reqwest for high concurrency without complexity
+- Precise latency histograms using hdrhistogram — see what really happens under pressure
+- Multi-process mode to push CPU and network limits cleanly
+- Metrics that matter: RPS, quantiles, status codes, and transport errors
+- Realistic client behavior — tune timeouts, connection reuse, and idle socket lifetimes to see how the system handles real-world load
+- Structured output — generate JSON reports with configuration and results for tracking runs over time
+
 
 
 ## Project Status
