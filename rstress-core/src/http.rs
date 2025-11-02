@@ -5,7 +5,7 @@ use std::time::Duration;
 use crate::config::Config;
 
 pub fn build_client(cfg: &Config) -> Result<Client> {
-    let timeout = humantime::parse_duration(&cfg.timeout)?;
+    let timeout = humantime::parse_duration(&cfg.timeout_c)?;
     Ok(Client::builder()
         .pool_max_idle_per_host(cfg.pool_max_idle)
         .pool_idle_timeout(Duration::from_secs(cfg.pool_idle_timeout))
@@ -30,7 +30,8 @@ mod tests {
             rate_per_sec: 1,
             concurrency_per_process: 1,
             processes: 1,
-            timeout: "1s".to_string(),
+            timeout_c: "1s".to_string(),
+            timeout_r: 1,
             verify_tls: true,
             pool_max_idle: 10,
             pool_idle_timeout: 30,
@@ -40,7 +41,7 @@ mod tests {
     #[test]
     fn build_client_ok_with_valid_timeout() {
         let mut cfg = base_cfg();
-        cfg.timeout = "2s".to_string();
+        cfg.timeout_c = "2s".to_string();
         let client = build_client(&cfg);
         assert!(client.is_ok(), "client should build for a valid timeout");
     }
@@ -48,7 +49,7 @@ mod tests {
     #[test]
     fn build_client_err_with_invalid_timeout() {
         let mut cfg = base_cfg();
-        cfg.timeout = "not-a-duration".to_string();
+        cfg.timeout_c = "not-a-duration".to_string();
         let client = build_client(&cfg);
         assert!(client.is_err(), "invalid humantime duration must error");
     }
