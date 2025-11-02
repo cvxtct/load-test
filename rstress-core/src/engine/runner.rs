@@ -33,17 +33,17 @@ pub async fn run(cli: &Cli, cfg: &Config) -> Result<()> {
     match cli.worker {
         None => {
             if cfg.processes == 1 {
-                // ⏱️ mark start
+                // mark start
                 let started: DateTime<Utc> = Utc::now();
                 let t0 = Instant::now();
 
                 let m = run_worker(0, cfg).await?;
                 let elapsed = t0.elapsed().as_secs_f64();
 
-                // 🖨️ print console summary
+                // print console summary
                 print_human(Some(0), &m, elapsed);
 
-                // 💾 write JSON report
+                // write JSON report
                 let ts = started.format("%Y%m%dT%H%M%SZ").to_string();
                 let fname = format!("{}-worker-0.json", ts);
                 let rep = WorkerReport::from_metrics(Some(0), &m, started, elapsed);
