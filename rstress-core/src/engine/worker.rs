@@ -2,16 +2,19 @@ use anyhow::{Context, Result};
 use bytes::Bytes;
 use reqwest::Client;
 use std::{sync::Arc, time::Instant, u64};
-use tokio::{sync::{mpsc, Semaphore}, time};
 use tokio::time::{timeout, Duration};
+use tokio::{
+    sync::{mpsc, Semaphore},
+    time,
+};
 use tracing::info;
 
 use crate::{
     config::Config,
+    engine::request::{build_request_spec, RequestSpec},
     http::build_client,
     metrics::metrics::Metrics,
-    util::{is_ok_status, classify_reqwest_error},
-    engine::request::{RequestSpec, build_request_spec},
+    util::{classify_reqwest_error, is_ok_status},
 };
 
 /// Run a single worker (one process) and return its Metrics.
@@ -25,7 +28,7 @@ pub async fn run_worker(worker_id: usize, cfg: &Config) -> Result<Metrics> {
 
     // Split global rate across processes
     let base = cfg.rate_per_sec / cfg.processes as u32;
-    let rem  = cfg.rate_per_sec % cfg.processes as u32;
+    let rem = cfg.rate_per_sec % cfg.processes as u32;
     let calced_rate = base + if worker_id < rem as usize { 1 } else { 0 };
 
     if calced_rate == 0 {
@@ -55,12 +58,13 @@ pub async fn run_worker(worker_id: usize, cfg: &Config) -> Result<Metrics> {
     while Instant::now() < end_at {
         limiter.tick().await;
 
-        let permit = match semaphore.clone().try_acquire_owned() { // or acquire_owned()
+        let permit = match semaphore.clone().try_acquire_owned() {
+            // or acquire_owned()
             Ok(p) => p,
             Err(_) => {
-                    dropped += 1;
-                    continue;
-                    } // This skip request if permit is not available
+                dropped += 1;
+                continue;
+            } // This skip request if permit is not available
         };
 
         let client = client.clone();
