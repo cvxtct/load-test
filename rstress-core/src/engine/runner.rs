@@ -1,12 +1,12 @@
 use anyhow::{anyhow, Result};
+use chrono::{DateTime, Utc};
 use std::time::Instant;
-use chrono::{Utc, DateTime};
 
 use crate::{
     cli::Cli,
     config::Config,
     engine::{multiproc::spawn_workers, worker::run_worker},
-    metrics::report::{print_human, WorkerReport, write_run_json},
+    metrics::report::{print_human, write_run_json, WorkerReport},
 };
 
 pub async fn run(cli: &Cli, cfg: &Config) -> Result<()> {
