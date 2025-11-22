@@ -70,7 +70,10 @@ mod tests {
             let client = build_client(&cfg).expect("client builds");
 
             let res = client.get("https://self-signed.badssl.com/").send().await;
-            assert!(res.is_err(), "with verify_tls=true, self-signed should fail");
+            assert!(
+                res.is_err(),
+                "with verify_tls=true, self-signed should fail"
+            );
         }
 
         #[tokio::test]
@@ -83,7 +86,11 @@ mod tests {
 
             let res = client.get("https://self-signed.badssl.com/").send().await;
             let ok = res.map(|r| r.status()).ok();
-            assert_eq!(ok, Some(StatusCode::OK), "with verify_tls=false, request should succeed");
+            assert_eq!(
+                ok,
+                Some(StatusCode::OK),
+                "with verify_tls=false, request should succeed"
+            );
         }
     }
 }
