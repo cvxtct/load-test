@@ -11,7 +11,7 @@ use rstress_core::{
 #[tokio::main]
 async fn main() -> Result<()> {
     // Start a global, human-readable logger that listens to all tracing events,
-    // formats them to stdout, and respects the RUST_LOG environment variable (default: info) 
+    // formats them to stdout, and respects the RUST_LOG environment variable (default: info)
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::try_from_default_env().unwrap_or_else(|_| "info".into()))
         .init();

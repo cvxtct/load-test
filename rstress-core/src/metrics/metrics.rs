@@ -7,9 +7,9 @@ pub struct Metrics {
     pub ok: u64,
     pub err: u64,
     pub dropped: u64,
-    pub hist: Histogram<u64>,                           // microseconds
-    pub codes: BTreeMap<u16, u64>,                      // HTTP status counts; 0 == transport error
-    pub transport: BTreeMap<&'static str, u64>,         // classified transport errors
+    pub hist: Histogram<u64>,                   // microseconds
+    pub codes: BTreeMap<u16, u64>,              // HTTP status counts; 0 == transport error
+    pub transport: BTreeMap<&'static str, u64>, // classified transport errors
 }
 
 impl Default for Metrics {
@@ -23,7 +23,11 @@ impl Metrics {
         let mut h = Histogram::<u64>::new_with_bounds(1, 10_000_000, 3).unwrap(); // 1us..10s
         h.auto(true);
         Self {
-            sent: 0, ok: 0, err: 0, dropped:0, hist: h,
+            sent: 0,
+            ok: 0,
+            err: 0,
+            dropped: 0,
+            hist: h,
             codes: BTreeMap::new(),
             transport: BTreeMap::new(),
         }
@@ -31,7 +35,11 @@ impl Metrics {
 
     pub fn record(&mut self, ok: bool, lat_us: u64, code: Option<u16>) {
         self.sent += 1;
-        if ok { self.ok += 1; } else { self.err += 1; }
+        if ok {
+            self.ok += 1;
+        } else {
+            self.err += 1;
+        }
         let _ = self.hist.record(lat_us.min(10_000_000));
         *self.codes.entry(code.unwrap_or(0)).or_insert(0) += 1;
     }

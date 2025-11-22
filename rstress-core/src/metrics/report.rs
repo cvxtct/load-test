@@ -1,9 +1,8 @@
 // report.rs
 use super::{aggregate::quantile_ms, metrics::Metrics};
+use chrono::{DateTime, Utc};
 use serde::Serialize;
 use std::{fs, path::Path};
-use chrono::{DateTime, Utc};
-
 
 pub fn print_json(m: &Metrics) -> String {
     #[derive(serde::Serialize)]
@@ -29,7 +28,8 @@ pub fn print_json(m: &Metrics) -> String {
         p50_ms: crate::metrics::aggregate::quantile_ms(&m.hist, 50.0),
         p95_ms: crate::metrics::aggregate::quantile_ms(&m.hist, 95.0),
         p99_ms: crate::metrics::aggregate::quantile_ms(&m.hist, 99.0),
-    }).unwrap()
+    })
+    .unwrap()
 }
 
 pub fn print_human(worker: Option<usize>, m: &Metrics, elapsed_s: f64) {
@@ -55,8 +55,11 @@ pub fn print_human(worker: Option<usize>, m: &Metrics, elapsed_s: f64) {
     if !m.codes.is_empty() {
         println!("status codes:");
         for (code, count) in &m.codes {
-            if *code == 0 { println!("  0 (Transport Errors): {}", count); }
-            else { println!("  {}: {}", code, count); }
+            if *code == 0 {
+                println!("  0 (Transport Errors): {}", count);
+            } else {
+                println!("  {}: {}", code, count);
+            }
         }
     }
     if !m.transport.is_empty() {
@@ -88,7 +91,12 @@ pub struct WorkerReport<'a> {
 }
 
 impl<'a> WorkerReport<'a> {
-    pub fn from_metrics(worker_id: Option<usize>, m: &'a Metrics, started_at: DateTime<Utc>, elapsed_s: f64) -> Self {
+    pub fn from_metrics(
+        worker_id: Option<usize>,
+        m: &'a Metrics,
+        started_at: DateTime<Utc>,
+        elapsed_s: f64,
+    ) -> Self {
         let rps = m.sent as f64 / elapsed_s.max(1e-6);
         Self {
             worker_id,
@@ -110,8 +118,8 @@ impl<'a> WorkerReport<'a> {
 
 #[derive(Serialize)]
 pub struct RunReport<'a, C: Serialize> {
-    pub run_id: String,              // ISO timestamp string
-    pub config: &'a C,               // snapshot (redacted or full)
+    pub run_id: String, // ISO timestamp string
+    pub config: &'a C,  // snapshot (redacted or full)
     pub workers: Vec<WorkerReport<'a>>,
 }
 
@@ -121,8 +129,11 @@ pub fn write_run_json<C: Serialize, P: AsRef<Path>>(
     workers: Vec<WorkerReport<'_>>,
 ) -> std::io::Result<()> {
     let run_id = chrono::Utc::now().to_rfc3339();
-    let doc = RunReport { run_id, config, workers };
+    let doc = RunReport {
+        run_id,
+        config,
+        workers,
+    };
     let s = serde_json::to_string_pretty(&doc).expect("serialize run report");
     fs::write(path, s)
 }
-
