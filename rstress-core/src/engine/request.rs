@@ -18,13 +18,21 @@ pub fn build_request_spec(cfg: &Config) -> Result<RequestSpec> {
         other => anyhow::bail!("unsupported method: {other}"),
     };
 
-    let headers = cfg.headers.iter()
-        .filter_map(|(k, v)| HeaderName::from_bytes(k.as_bytes()).ok().map(|hn| (hn, v.clone())))
+    let headers = cfg
+        .headers
+        .iter()
+        .filter_map(|(k, v)| {
+            HeaderName::from_bytes(k.as_bytes())
+                .ok()
+                .map(|hn| (hn, v.clone()))
+        })
         .collect::<Vec<_>>();
 
     let payload = if let Some(path) = &cfg.payload_file {
         Some(std::fs::read(path)?)
-    } else { None };
+    } else {
+        None
+    };
 
     Ok(RequestSpec {
         url: cfg.target_url.clone(),

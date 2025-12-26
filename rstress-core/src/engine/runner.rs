@@ -1,12 +1,12 @@
 use anyhow::{anyhow, Result};
+use chrono::{DateTime, Utc};
 use std::time::Instant;
-use chrono::{Utc, DateTime};
 
 use crate::{
     cli::Cli,
     config::Config,
     engine::{multiproc::spawn_workers, worker::run_worker},
-    metrics::report::{print_human, WorkerReport, write_run_json},
+    metrics::report::{print_human, write_run_json, WorkerReport},
 };
 
 pub async fn run(cli: &Cli, cfg: &Config) -> Result<()> {
@@ -33,17 +33,17 @@ pub async fn run(cli: &Cli, cfg: &Config) -> Result<()> {
     match cli.worker {
         None => {
             if cfg.processes == 1 {
-                // ⏱️ mark start
+                // mark start
                 let started: DateTime<Utc> = Utc::now();
                 let t0 = Instant::now();
 
                 let m = run_worker(0, cfg).await?;
                 let elapsed = t0.elapsed().as_secs_f64();
 
-                // 🖨️ print console summary
+                // print console summary
                 print_human(Some(0), &m, elapsed);
 
-                // 💾 write JSON report
+                // write JSON report
                 let ts = started.format("%Y%m%dT%H%M%SZ").to_string();
                 let fname = format!("{}-worker-0.json", ts);
                 let rep = WorkerReport::from_metrics(Some(0), &m, started, elapsed);
